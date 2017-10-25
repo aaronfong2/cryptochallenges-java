@@ -7,6 +7,7 @@ public class Set1Main {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
+		/*
 		String hex = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
 		String output = null;
 		
@@ -43,11 +44,30 @@ public class Set1Main {
 		System.out.println("Encoded string:");
 		System.out.println(c3encoded);
 		System.out.println("Top Decodings: key, score, decoded text");
-		StrScore scores[] = charDec(c3encoded, 10);	
+		StrScore scores[] = charDec(c3encoded, 5);	
 		for (StrScore s: scores) {
 			System.out.println(s.key + "," + s.score + "," + s.str);
 		}
 		
+		System.out.println("\nCHALLENGE4");
+		String filename = "4.txt";
+		scores = charDecLines(filename, 5);
+		
+		System.out.println("Top Decodings: key, score, line#, decoded text");
+		for (StrScore s: scores) {
+			System.out.println(s.key + "," + s.score + "," + s.getLineNum() + "," + s.str);
+		}
+		
+		*/
+		
+		System.out.println("\nCHALLENGE5");
+		String line1 = "Burning 'em, if you ain't quick and nimble";
+		String line2 = "I go crazy when I hear a cymbal";
+		System.out.println("Plaintext:");
+		System.out.println(line1 + "\n" + line2);
+		System.out.println("Encrypted with \"ICE\"");
+		System.out.println(bytesToHex(strXOR(line1,"ICE")));
+		System.out.println(bytesToHex(strXOR(line2,"ICE")));
 	}
 
 }

@@ -26,7 +26,7 @@ public class Set1Functions {
 	public static String bytesToHex(byte[] data) {
 		try(Formatter formatter = new Formatter(new StringBuilder(data.length * 2))) {
 			for (int i = 0; i < data.length; i ++) {
-				formatter.format("%x", data[i]);
+				formatter.format("%02x", data[i]);
 			}
 			
 			return formatter.toString();
@@ -66,6 +66,23 @@ public class Set1Functions {
 		}
 		
 		return new String(data);
+	}
+	
+	public static byte[] strXOR(String plaintext, byte[] key) {
+		byte encrypted[] = new byte[plaintext.length()];
+		int j = 0;
+		
+		if (key == null) return null;
+		for (int i = 0; i < plaintext.length(); i++) {
+			encrypted[i] = (byte)((int)plaintext.charAt(i) ^ (int)key[j]);
+			j = (j+1) % key.length;
+		}
+		
+		return encrypted;
+	}
+	
+	public static byte[] strXOR(String plaintext, String key) {
+		return strXOR(plaintext, key.getBytes());
 	}
 
 }
