@@ -118,4 +118,56 @@ public class Set1FunctionsTest {
 		assertEquals(answer,output);
 	}
 
+	@Test
+	public void testHammingDistance() {
+		String str1 = "abc";
+		String str2 = "abc";
+		try {
+			assertEquals(0, Set1Functions.hammingDistance(str1, str2));
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+
+	}
+	
+	@Test
+	public void testHammingDistance2() {
+		String str1 = "ccc";
+		String str2 = "bbb";
+		try {
+			assertEquals(3, Set1Functions.hammingDistance(str1, str2));
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+
+	}
+	
+	@Test
+	public void testHammingDistance3() {
+		String str1 = "this is a test";
+		String str2 = "wokka wokka!!!";
+		try {
+			assertEquals(37, Set1Functions.hammingDistance(str1, str2));
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+
+	}
+	
+	@Test
+	public void testNormalizedHammingDistance() {
+		String str1 = "cccccccccc";
+		String str2 = "bbbbbbbbbb";
+		try {
+			assertEquals(1.0, Set1Functions.normalizedHammingDistance(str1, str2), 1E-10);
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+	}
+	
+	
 }

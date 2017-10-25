@@ -68,6 +68,11 @@ public class Set1Main {
 		System.out.println("Encrypted with \"ICE\"");
 		System.out.println(bytesToHex(strXOR(line1,"ICE")));
 		System.out.println(bytesToHex(strXOR(line2,"ICE")));
+		
+		String msg = "This challenge isn't conceptually hard, but it involves actual error-prone coding. The other challenges in this set are there to bring you up to speed. This one is there to qualify you. If you can do this one, you're probably just fine up to Set 6.";
+		String key = "longkey";
+		System.out.println(bytesToHex(strXOR(msg,key)));
+		
 	}
 
 }

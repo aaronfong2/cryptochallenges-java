@@ -42,6 +42,11 @@ public class Set1Functions {
 		return bytesToB64(hexToBytes(hex));
 	}
 	
+	public static String b64ToString(String b64) {
+		Decoder decoder = Base64.getDecoder();
+		return new String(decoder.decode(b64));	
+	}
+	
 	public static byte[] bytesXOR(byte[] array1, byte[] array2) throws Exception {
 		if (array1.length != array2.length)
 			throw new Exception("Arrays must be same length");
@@ -83,6 +88,36 @@ public class Set1Functions {
 	
 	public static byte[] strXOR(String plaintext, String key) {
 		return strXOR(plaintext, key.getBytes());
+	}
+	
+	public static int hammingDistance(String str1, String str2) throws Exception {
+		if (str1.length() != str2.length()) {
+			throw new Exception("Strings are different lengths");
+		}
+		if (str1.length() == 0) return 0;
+		
+		int distance = 0;
+		// Just need to count differing bits in XOR
+		byte xor[] = strXOR(str1,str2);
+		byte temp = 0;
+		
+		for (int i = 0; i < xor.length; i++) {
+			temp = xor[i];
+			for (int j = 0; j < 8; j++) {
+				if ((temp & 1) == 1)
+					distance++;
+				temp = (byte)(temp >> 1);	
+			}
+		}
+		
+		return distance;
+	}
+	
+	public static double normalizedHammingDistance(String str1, String str2) throws Exception {
+		int distance = hammingDistance(str1,str2);
+		if (str1.length() == 0) return 0;
+		
+		return (double)distance / str1.length();
 	}
 
 }
