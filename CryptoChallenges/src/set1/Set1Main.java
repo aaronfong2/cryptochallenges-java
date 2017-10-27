@@ -7,7 +7,7 @@ public class Set1Main {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		/*
+/*
 		String hex = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
 		String output = null;
 		
@@ -58,7 +58,6 @@ public class Set1Main {
 			System.out.println(s.key + "," + s.score + "," + s.getLineNum() + "," + s.str);
 		}
 		
-		*/
 		
 		System.out.println("\nCHALLENGE5");
 		String line1 = "Burning 'em, if you ain't quick and nimble";
@@ -68,10 +67,15 @@ public class Set1Main {
 		System.out.println("Encrypted with \"ICE\"");
 		System.out.println(bytesToHex(strXOR(line1,"ICE")));
 		System.out.println(bytesToHex(strXOR(line2,"ICE")));
+*/		
+		System.out.println("\nCHALLENGE6");
+		String filename2 = "6.txt";
+		System.out.println("Possible plaintexts:");
+		String plaintexts[] = BreakRKXOR.decodeFile(filename2, 10);
+		for (String s: plaintexts) {
+			System.out.println(s);
+		}
 		
-		String msg = "This challenge isn't conceptually hard, but it involves actual error-prone coding. The other challenges in this set are there to bring you up to speed. This one is there to qualify you. If you can do this one, you're probably just fine up to Set 6.";
-		String key = "longkey";
-		System.out.println(bytesToHex(strXOR(msg,key)));
 		
 	}
 

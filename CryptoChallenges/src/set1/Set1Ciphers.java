@@ -68,8 +68,9 @@ public class Set1Ciphers {
 		
 		for (int i = 0; i <  s.length(); i++) {
 			c = s.charAt(i);
-			// Return 0 if any non-ascii characters found
-			if (c > 126) return 0;
+			// Return 0 if any non-printable ASCII characters found
+			// Allow TAB, LF, CR
+			if (c > 126 || (c < 32 && c != 9 && c != 0xA && c != 0xD)) return 0;
 			w = CWEIGHTS.get(s.charAt(i));
 			if (w != null) {
 				total += w;
@@ -152,6 +153,38 @@ public class Set1Ciphers {
 		return results;
 	}
 
+	/*
+	 * Same as charDec but directly takes encrypted string (not hex encoded)
+	 */
+	public static StrScore[] strCharDec(String cryptotext, int topN) {
+		if (topN < 1)
+			throw new IllegalArgumentException("Must request at least top 1");
+		StrScore results[] = new StrScore[topN];
+		PriorityQueue<StrScore> pq = new PriorityQueue<StrScore>(256, Collections.reverseOrder());
+		
+		String key = null;
+		String decoded = null;
+		StrScore curRes = null;
+		float score = -1.0f;
+		byte b = 0;
+		
+		
+		for (short i = 0; i < 256; i++) {
+			b = (byte)i;
+			decoded = new String(Set1Functions.strXOR(cryptotext, new byte[]{b}));
+			score = calcScore(decoded);
+			key = new String(new byte[] {b});
+			curRes = new StrScore(decoded, score, key);
+			
+			pq.add(curRes);
+		}
+		
+		for (int i = 0; i < topN; i++) {
+			results[i] = pq.remove();
+		}
+		
+		return results;
+	}
 
 	/*
 	public static void swap(Object[] array, int index0, int index1) {

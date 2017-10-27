@@ -1,9 +1,12 @@
 package set1;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.PriorityQueue;
 
+import set1.Set1Functions;
 import set1.Set1Ciphers.*;
-import set1.Set1Functions.*;
 
 
 public class BreakRKXOR {
@@ -74,4 +77,58 @@ public class BreakRKXOR {
 		
 		return transposed;
 	}
+	
+	public static String[] decode(String cryptotext, int numKeysizes) {
+		String plaintexts[] = new String[numKeysizes];
+		String keys[] = new String[numKeysizes];
+		String transposed[] = null;
+		byte currKey[] = null;
+		
+		// Find top few key sizes
+		int keysizes[] = bestKeysizes(cryptotext, numKeysizes);
+		
+		for (int i = 0; i < numKeysizes; i++) {
+			int ks = keysizes[i];
+			currKey = new byte[ks];
+			// Split cryptotext into blocks that have been encoded with same letter
+			transposed = transposeBlocks(cryptotext, ks);
+			for (int j = 0; j < ks; j++) {
+				// Decode each block as single char XOR
+				StrScore sScore[] = Set1Ciphers.strCharDec(transposed[j], 1);
+				// Just keep the key chars, recalculate plaintext at the end for simplicity
+				currKey[j] = (byte)(sScore[0].key.charAt(0));
+			}
+			keys[i] = new String(currKey);
+			plaintexts[i] = new String(Set1Functions.strXOR(cryptotext, keys[i]));
+		}
+		
+		return plaintexts;
+	}
+	
+	/*
+	 * Take Base64 encoded file and decode repeating-key XOR
+	 */
+	public static String[] decodeFile(String filename, int numKeysizes) {
+		String cryptotext = null;
+		String plaintexts[] = null;
+		
+		try (BufferedReader br = new BufferedReader(
+				new FileReader(filename))) {
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+			cryptotext = Set1Functions.b64ToString(sb.toString());
+		}
+		catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
+		
+		plaintexts = decode(cryptotext, numKeysizes);
+		
+		return plaintexts;
+	}
+	
+	
 }
