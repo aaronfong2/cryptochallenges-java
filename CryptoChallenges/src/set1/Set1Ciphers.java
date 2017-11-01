@@ -79,8 +79,8 @@ public class Set1Ciphers {
 		return total;
 	}
 	
-	public static StrScore[] charDec(String secret) {
-		return charDec(secret, NUM_BEST_STRINGS);
+	public static StrScore[] charDecHex(String secret) {
+		return charDecHex(secret, NUM_BEST_STRINGS);
 	}
 	/**
 	 * This function takes in a hex encoded string that has been encrypted
@@ -92,7 +92,7 @@ public class Set1Ciphers {
 	 * top N results.
 	 */
 	// topN is how many top results will be returned
-	public static StrScore[] charDec(String hexSecret, int topN) {
+	public static StrScore[] charDecHex(String hexSecret, int topN) {
 		if (topN < 1)
 			throw new IllegalArgumentException("Must request at least top 1");
 		StrScore results[] = new StrScore[topN];
@@ -122,7 +122,7 @@ public class Set1Ciphers {
 		return results;
 	}
 	
-	public static StrScore[] charDecLines(String filename, int topN) {
+	public static StrScore[] charDecHexLines(String filename, int topN) {
 		PriorityQueue<StrScore> pq = new PriorityQueue<StrScore>(256, Collections.reverseOrder());
 		StrScore tempResults[] = null;
 		StrScore results[] = new StrScore[topN];
@@ -132,7 +132,7 @@ public class Set1Ciphers {
 		try (BufferedReader br =
 				new BufferedReader(new FileReader(filename))) {
 			while ((line = br.readLine()) != null) {
-				tempResults = charDec(line);
+				tempResults = charDecHex(line);
 				for (StrScore ss : tempResults) {
 					ss.setLineNum(lineCount);
 					pq.add(ss);
@@ -156,7 +156,7 @@ public class Set1Ciphers {
 	/*
 	 * Same as charDec but directly takes encrypted string (not hex encoded)
 	 */
-	public static StrScore[] strCharDec(String cryptotext, int topN) {
+	public static StrScore[] charDec(String cryptotext, int topN) {
 		if (topN < 1)
 			throw new IllegalArgumentException("Must request at least top 1");
 		StrScore results[] = new StrScore[topN];

@@ -7,7 +7,6 @@ public class Set1Main {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-/*
 		String hex = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
 		String output = null;
 		
@@ -44,14 +43,14 @@ public class Set1Main {
 		System.out.println("Encoded string:");
 		System.out.println(c3encoded);
 		System.out.println("Top Decodings: key, score, decoded text");
-		StrScore scores[] = charDec(c3encoded, 5);	
+		StrScore scores[] = charDecHex(c3encoded, 5);	
 		for (StrScore s: scores) {
 			System.out.println(s.key + "," + s.score + "," + s.str);
 		}
 		
 		System.out.println("\nCHALLENGE4");
 		String filename = "4.txt";
-		scores = charDecLines(filename, 5);
+		scores = charDecHexLines(filename, 5);
 		
 		System.out.println("Top Decodings: key, score, line#, decoded text");
 		for (StrScore s: scores) {
@@ -66,7 +65,6 @@ public class Set1Main {
 		System.out.println("Encrypted with \"ICE\"");
 		System.out.println(bytesToHex(strXOR(line1,"ICE")));
 		System.out.println(bytesToHex(strXOR(line2,"ICE")));
-*/
 
 		System.out.println("\nCHALLENGE6");
 		String filename2 = "6.txt";

@@ -3,7 +3,6 @@ package set1;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.PriorityQueue;
@@ -60,16 +59,17 @@ public class BreakRKXOR {
 	
 	public static byte[][] transposeBlocks(byte[] cryptotext, int keysize) {
 		byte transposed[][] = new byte[keysize][];
+		int modulus = cryptotext.length % keysize;
 		
 		for (int i = 0; i < keysize; i++) {
 			transposed[i] = new byte[cryptotext.length/keysize
-			                         + (cryptotext.length % keysize > 0 ? 1 : 0)];
+			                         + (modulus >= i+1 ? 1 : 0)];
 		}
 		
-		for (int i = 0; i < cryptotext.length; i+=keysize) {
+		for (int i = 0; i*keysize < cryptotext.length; i++) {
 			for (int j = 0; j < keysize; j++) {
-				if (j+i < cryptotext.length)
-					transposed[i][j] = cryptotext[j+i];
+				if (i*keysize + j < cryptotext.length)
+					transposed[j][i] = cryptotext[i*keysize + j];
 				else
 					break;
 			}
@@ -93,12 +93,17 @@ public class BreakRKXOR {
 			transposed = transposeBlocks(cryptotext, ks);
 			for (int j = 0; j < ks; j++) {
 				// Decode each block as single char XOR
-				StrScore sScore[] = Set1Ciphers.strCharDec(transposed[j], 1);
+				StrScore sScore[] = Set1Ciphers.charDec(new String(transposed[j]), 1);
 				// Just keep the key chars, recalculate plaintext at the end for simplicity
 				currKey[j] = (byte)(sScore[0].key.charAt(0));
 			}
-			decoded[i] = new StrScore(new String(Set1Functions.strXOR(cryptotext, currKey)),
+			try {
+				decoded[i] = new StrScore(new String(Set1Functions.bytesXOR(cryptotext, currKey)),
 										0.0f, new String(currKey));
+			}
+			catch (Exception e) {
+				System.err.println(e.getMessage());
+			}
 		}
 		
 		return decoded;
