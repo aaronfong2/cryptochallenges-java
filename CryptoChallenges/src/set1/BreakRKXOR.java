@@ -3,6 +3,9 @@ package set1;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.PriorityQueue;
 
 import set1.Set1Functions;
@@ -28,16 +31,16 @@ public class BreakRKXOR {
 		}
 	}
 	
-	public static int[] bestKeysizes(String cryptotext, int numBest) {
+	public static int[] bestKeysizes(byte[] cryptotext, int numBest) {
 		int keysizes[] = new int[numBest];
 		PriorityQueue<KeysizeScore> pq= new PriorityQueue<KeysizeScore>();
 		KeysizeScore kscore = null;
 		double hd = 0;
-		String first = null, second = null;
+		byte[] first = null, second = null;
 		
-		for (int i = 1; i <= MAX_KEYSIZE && i < cryptotext.length() / 2; i++) {
-			first = cryptotext.substring(0,i);
-			second = cryptotext.substring(i,2*i);
+		for (int i = 1; i <= MAX_KEYSIZE && i < cryptotext.length / 2; i++) {
+			first = Arrays.copyOfRange(cryptotext, 0, i);
+			second = Arrays.copyOfRange(cryptotext,i,2*i);
 			try {
 				hd = Set1Functions.normalizedHammingDistance(first, second);
 				kscore = new KeysizeScore(i,hd);
@@ -55,33 +58,29 @@ public class BreakRKXOR {
 		return keysizes;
 	}
 	
-	public static String[] transposeBlocks(String cryptotext, int keysize) {
-		String transposed[] = new String[keysize];
-		StringBuilder sb[] = new StringBuilder[keysize];
+	public static byte[][] transposeBlocks(byte[] cryptotext, int keysize) {
+		byte transposed[][] = new byte[keysize][];
 		
 		for (int i = 0; i < keysize; i++) {
-			sb[i] = new StringBuilder();
+			transposed[i] = new byte[cryptotext.length/keysize
+			                         + (cryptotext.length % keysize > 0 ? 1 : 0)];
 		}
 		
-		for (int i = 0; i < cryptotext.length(); i+=keysize) {
+		for (int i = 0; i < cryptotext.length; i+=keysize) {
 			for (int j = 0; j < keysize; j++) {
-				if (j+i < cryptotext.length())
-					sb[j].append(cryptotext.substring(j+i, j+i+1));
+				if (j+i < cryptotext.length)
+					transposed[i][j] = cryptotext[j+i];
 				else
 					break;
 			}
-		}
-		for (int i = 0; i < keysize; i++) {
-			transposed[i] = sb[i].toString();
 		}
 		
 		return transposed;
 	}
 	
-	public static String[] decode(String cryptotext, int numKeysizes) {
-		String plaintexts[] = new String[numKeysizes];
-		String keys[] = new String[numKeysizes];
-		String transposed[] = null;
+	public static StrScore[] decode(byte[] cryptotext, int numKeysizes) {
+		StrScore decoded[] = new StrScore[numKeysizes];
+		byte transposed[][] = null;
 		byte currKey[] = null;
 		
 		// Find top few key sizes
@@ -98,19 +97,19 @@ public class BreakRKXOR {
 				// Just keep the key chars, recalculate plaintext at the end for simplicity
 				currKey[j] = (byte)(sScore[0].key.charAt(0));
 			}
-			keys[i] = new String(currKey);
-			plaintexts[i] = new String(Set1Functions.strXOR(cryptotext, keys[i]));
+			decoded[i] = new StrScore(new String(Set1Functions.strXOR(cryptotext, currKey)),
+										0.0f, new String(currKey));
 		}
 		
-		return plaintexts;
+		return decoded;
 	}
 	
 	/*
 	 * Take Base64 encoded file and decode repeating-key XOR
 	 */
-	public static String[] decodeFile(String filename, int numKeysizes) {
-		String cryptotext = null;
-		String plaintexts[] = null;
+	public static StrScore[] decodeFile(String filename, int numKeysizes) {
+		byte[] cryptotext = null;
+		StrScore decoded[] = null;
 		
 		try (BufferedReader br = new BufferedReader(
 				new FileReader(filename))) {
@@ -119,15 +118,15 @@ public class BreakRKXOR {
 			while ((line = br.readLine()) != null) {
 				sb.append(line);
 			}
-			cryptotext = Set1Functions.b64ToString(sb.toString());
+			cryptotext = Base64.getDecoder().decode(sb.toString());
 		}
 		catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
 		
-		plaintexts = decode(cryptotext, numKeysizes);
+		decoded = decode(cryptotext, numKeysizes);
 		
-		return plaintexts;
+		return decoded;
 	}
 	
 	

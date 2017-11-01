@@ -35,7 +35,7 @@ public class Set1Main {
 		System.out.println(array2);
 		System.out.println("XOR:");
 		System.out.println(output);
-		
+
 		
 		System.out.println("\nCHALLENGE3");
 		//System.out.println(hexXOR("ab12ab",(byte)0x11));
@@ -58,7 +58,6 @@ public class Set1Main {
 			System.out.println(s.key + "," + s.score + "," + s.getLineNum() + "," + s.str);
 		}
 		
-		
 		System.out.println("\nCHALLENGE5");
 		String line1 = "Burning 'em, if you ain't quick and nimble";
 		String line2 = "I go crazy when I hear a cymbal";
@@ -67,14 +66,16 @@ public class Set1Main {
 		System.out.println("Encrypted with \"ICE\"");
 		System.out.println(bytesToHex(strXOR(line1,"ICE")));
 		System.out.println(bytesToHex(strXOR(line2,"ICE")));
-*/		
+*/
+
 		System.out.println("\nCHALLENGE6");
 		String filename2 = "6.txt";
 		System.out.println("Possible plaintexts:");
-		String plaintexts[] = BreakRKXOR.decodeFile(filename2, 10);
-		for (String s: plaintexts) {
-			System.out.println(s);
+		StrScore decoded[] = BreakRKXOR.decodeFile(filename2, 10);
+		for (StrScore s: decoded) {
+			System.out.println(s.key + "," + s.str);
 		}
+
 		
 		
 	}

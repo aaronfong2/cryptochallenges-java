@@ -90,27 +90,33 @@ public class Set1Functions {
 		return strXOR(plaintext, key.getBytes());
 	}
 	
+	public static int count1Bits(byte[] array) {
+		int count = 0;
+		byte temp = 0;
+		for (int i = 0; i < array.length; i++) {
+			temp = array[i];
+			for (int j = 0; j < 8; j++) {
+				if ((temp & 1) == 1)
+					count++;
+				temp = (byte)(temp >> 1);	
+			}
+		}
+		return count;
+	}
+	
 	public static int hammingDistance(String str1, String str2) throws Exception {
 		if (str1.length() != str2.length()) {
 			throw new Exception("Strings are different lengths");
 		}
 		if (str1.length() == 0) return 0;
-		
-		int distance = 0;
-		// Just need to count differing bits in XOR
+
 		byte xor[] = strXOR(str1,str2);
-		byte temp = 0;
-		
-		for (int i = 0; i < xor.length; i++) {
-			temp = xor[i];
-			for (int j = 0; j < 8; j++) {
-				if ((temp & 1) == 1)
-					distance++;
-				temp = (byte)(temp >> 1);	
-			}
-		}
-		
-		return distance;
+		return count1Bits(xor);
+	}
+	
+	public static int hammingDistance(byte[] array1, byte[] array2) throws Exception {
+		byte xor[] = bytesXOR(array1,array2);
+		return count1Bits(xor);
 	}
 	
 	public static double normalizedHammingDistance(String str1, String str2) throws Exception {
@@ -118,6 +124,13 @@ public class Set1Functions {
 		if (str1.length() == 0) return 0;
 		
 		return (double)distance / str1.length();
+	}
+
+	public static double normalizedHammingDistance(byte[] array1, byte[] array2) throws Exception {
+		int distance = hammingDistance(array1,array2);
+		if (array1.length == 0) return 0;
+		
+		return (double)distance / array1.length;
 	}
 
 }
