@@ -1,5 +1,8 @@
 package set1;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.Base64.*;
 
@@ -45,6 +48,23 @@ public class Set1Functions {
 	public static String b64ToString(String b64) {
 		Decoder decoder = Base64.getDecoder();
 		return new String(decoder.decode(b64));	
+	}
+	
+	public static byte[] b64FileToBytes(String filename) {
+		byte data[] = null;
+		try (BufferedReader br = new BufferedReader(
+				new FileReader(filename))) {
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
+			}
+			data = Base64.getDecoder().decode(sb.toString());
+		}
+		catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
+		return data;
 	}
 	
 	public static byte[] bytesXOR(byte[] plaintext, byte[] key) {

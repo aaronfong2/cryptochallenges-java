@@ -2,10 +2,21 @@ package set1;
 
 import java.util.HashMap;
 import java.util.PriorityQueue;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.nio.charset.Charset;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class Set1Ciphers {
 	private static final int NUM_BEST_STRINGS = 3;
@@ -120,7 +131,7 @@ public class Set1Ciphers {
 				}
 				lineCount++;
 			}
-			System.out.println(lineCount);
+			//System.out.println(lineCount);
 		}
 		catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -176,5 +187,65 @@ public class Set1Ciphers {
 		}
 		
 		return results;
+	}
+	
+	public static byte[] aes128ECBDecode(byte[] cryptotext, byte[] key) {
+		byte[] decoded = null;
+		Cipher cipher = null;
+		SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
+		try {
+			cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			cipher.init(Cipher.DECRYPT_MODE, secretKey);
+			decoded = cipher.doFinal(cryptotext);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		}
+		return decoded;
+		
+	}
+	
+	/*
+	 * Detects the first byte array that has been encrypted with AES ECB mode
+	 */
+	public static byte[] detectAES128ECB(byte[][] cryptotexts) {
+		byte[] block1, block2;
+		for (int i = 0; i < cryptotexts.length; i++) {
+			for (int j = 0; (j+1)*16+15 < cryptotexts[i].length; j++) {
+				for (int k = j+1; k*16+15 < cryptotexts[i].length; k++) {
+					block1 = Arrays.copyOfRange(cryptotexts[i], j*16, (j+1)*16);
+					block2 = Arrays.copyOfRange(cryptotexts[i], k*16, (k+1)*16);
+					if (Arrays.equals(block1, block2)) {
+						System.out.println("Line#: " + i);
+						System.out.println("Repeated Block: " + Set1Functions.bytesToHex(block1));
+						return cryptotexts[i];
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static byte[] detectAES128ECBHexFile(String filename) {
+		ArrayList<byte[]> list = new ArrayList<byte[]>();
+		String line = null;
+		try (BufferedReader br =
+				new BufferedReader(new FileReader(filename))) {
+			while ((line = br.readLine()) != null) {
+				list.add(Set1Functions.hexToBytes(line));
+			}
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+			return null;
+		}	
+		return detectAES128ECB(list.toArray(new byte[0][]));
 	}
 }

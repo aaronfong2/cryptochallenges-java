@@ -1,6 +1,9 @@
 package set1;
 
 import static set1.Set1Functions.*;
+
+import java.io.UnsupportedEncodingException;
+
 import static set1.Set1Ciphers.*;
 
 public class Set1Main {
@@ -73,7 +76,7 @@ public class Set1Main {
 		System.out.println("\nCHALLENGE6");
 		String filename2 = "6.txt";
 		System.out.println("Possible plaintexts:");
-		StrScore decoded[] = BreakRKXOR.decodeFile(filename2, 4);
+		StrScore decoded[] = BreakRKXOR.decodeFile(filename2, 1);
 		for (StrScore s: decoded) {
 			System.out.println("Score: " + s.score);
 			System.out.println("Key: " + new String(s.key));
@@ -82,6 +85,22 @@ public class Set1Main {
 			System.out.println("----------------------------------------------");
 		}
 
+		System.out.println("\nCHALLENGE7");
+		String filename3 = "7.txt";
+		System.out.println("Plaintext:");
+		try {
+			System.out.println(new String(Set1Ciphers.aes128ECBDecode(
+					Set1Functions.b64FileToBytes(filename3),
+					"YELLOW SUBMARINE".getBytes("US-ASCII"))));
+		} catch (UnsupportedEncodingException e) {
+			System.err.println(e.getMessage());
+		}
+		
+		System.out.println("\nCHALLENGE8");
+		String filename4 = "8.txt";
+		System.out.println("AES ECB Line:");
+		byte aes[] = Set1Ciphers.detectAES128ECBHexFile(filename4);
+		System.out.println(Set1Functions.bytesToHex(aes));
 		
 		
 	}

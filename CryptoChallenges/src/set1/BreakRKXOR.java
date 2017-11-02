@@ -1,10 +1,6 @@
 package set1;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.PriorityQueue;
 
 import set1.Set1Functions;
@@ -117,23 +113,8 @@ public class BreakRKXOR {
 	 * Take Base64 encoded file and decode repeating-key XOR
 	 */
 	public static StrScore[] decodeFile(String filename, int numKeysizes) {
-		byte[] cryptotext = null;
-		StrScore decoded[] = null;
-		
-		try (BufferedReader br = new BufferedReader(
-				new FileReader(filename))) {
-			StringBuilder sb = new StringBuilder();
-			String line;
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-			cryptotext = Base64.getDecoder().decode(sb.toString());
-		}
-		catch (IOException e) {
-			System.err.println(e.getMessage());
-		}
-		
-		decoded = decode(cryptotext, numKeysizes);
+		byte[] cryptotext = Set1Functions.b64FileToBytes(filename);
+		StrScore decoded[] = decode(cryptotext, numKeysizes);
 		
 		return decoded;
 	}
