@@ -5,10 +5,12 @@ import java.util.PriorityQueue;
 import java.util.Collections;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.nio.charset.Charset;
 
 public class Set1Ciphers {
 	private static final int NUM_BEST_STRINGS = 3;
 	private static final HashMap<Character,Float> CWEIGHTS;
+	private static final float NONASCII_PENALTY = 1f;
 	
 	static {
 		// Weights based on Wikipedia's "Letter Frequency" article
@@ -29,19 +31,19 @@ public class Set1Ciphers {
 	}
 	
 	public static class StrScore implements Comparable<StrScore>{
-		public final String str;
+		public final byte[] str;
 		public final float score;
-		public final String key;
+		public final byte[] key;
 		private int lineNum;
 
-		public StrScore(String str, float score, String key, int lineNum) {
-			this.str = str;
+		public StrScore(byte[] str, float score, byte[] key, int lineNum) {
+			this.str = str.clone();
 			this.score = score;
-			this.key = key;
+			this.key = key.clone();
 			this.lineNum = lineNum;
 		}
 		
-		public StrScore(String str, float score, String key) {
+		public StrScore(byte[] str, float score, byte[] key) {
 			this(str,score,key,-1);
 		}
 		
@@ -59,7 +61,7 @@ public class Set1Ciphers {
 			this.lineNum = lineNum;
 		}
 	}
-
+	
 	public static float calcScore(String s) {
 		Float w = null;
 		float total = 0;
@@ -68,15 +70,20 @@ public class Set1Ciphers {
 		
 		for (int i = 0; i <  s.length(); i++) {
 			c = s.charAt(i);
-			// Return 0 if any non-printable ASCII characters found
-			// Allow TAB, LF, CR
-			if (c > 126 || (c < 32 && c != 9 && c != 0xA && c != 0xD)) return 0;
 			w = CWEIGHTS.get(s.charAt(i));
 			if (w != null) {
 				total += w;
 			}
+			// Penalize non-printable / non-ASCII characters
+			else if (c > 126 || (c < 32 && c != 9 && c != 0xA && c != 0xD)) {
+				total -= NONASCII_PENALTY;
+			}
 		}
 		return total;
+	}
+
+	public static float calcScore(byte[] s) {
+		return calcScore(new String(s));
 	}
 	
 	public static StrScore[] charDecHex(String secret) {
@@ -93,33 +100,7 @@ public class Set1Ciphers {
 	 */
 	// topN is how many top results will be returned
 	public static StrScore[] charDecHex(String hexSecret, int topN) {
-		if (topN < 1)
-			throw new IllegalArgumentException("Must request at least top 1");
-		StrScore results[] = new StrScore[topN];
-		PriorityQueue<StrScore> pq = new PriorityQueue<StrScore>(256, Collections.reverseOrder());
-		
-		String key = null;
-		String decoded = null;
-		StrScore curRes = null;
-		float score = -1.0f;
-		byte b = 0;
-		
-		
-		for (short i = 0; i < 256; i++) {
-			b = (byte)i;
-			decoded = Set1Functions.hexXOR(hexSecret, b);
-			score = calcScore(decoded);
-			key = new String(new byte[] {b});
-			curRes = new StrScore(decoded, score, key);
-			
-			pq.add(curRes);
-		}
-		
-		for (int i = 0; i < topN; i++) {
-			results[i] = pq.remove();
-		}
-		
-		return results;
+		return charDec(Set1Functions.hexToBytes(hexSecret),topN);
 	}
 	
 	public static StrScore[] charDecHexLines(String filename, int topN) {
@@ -153,17 +134,28 @@ public class Set1Ciphers {
 		return results;
 	}
 
-	/*
-	 * Same as charDec but directly takes encrypted string (not hex encoded)
+	/**
+	 * This function takes in a String that has been encrypted
+	 * using a single-character XOR. It returns the topN most likely messages
+	 * with their score and encoding key.
+	 * @param cryptotext The single-character XOR encoded String.
+	 * @param topN The number of desired results.
+	 * @return returns an array StrScore of size topN which contains up to
+	 * top N results.
+	 *
 	 */
 	public static StrScore[] charDec(String cryptotext, int topN) {
+		return charDec(cryptotext.getBytes(Charset.forName("US-ASCII")),topN);
+	}
+
+	public static StrScore[] charDec(byte[] cryptotext, int topN) {
 		if (topN < 1)
 			throw new IllegalArgumentException("Must request at least top 1");
 		StrScore results[] = new StrScore[topN];
 		PriorityQueue<StrScore> pq = new PriorityQueue<StrScore>(256, Collections.reverseOrder());
 		
-		String key = null;
-		String decoded = null;
+		byte[] key = null;
+		byte[] decoded = null;
 		StrScore curRes = null;
 		float score = -1.0f;
 		byte b = 0;
@@ -171,9 +163,9 @@ public class Set1Ciphers {
 		
 		for (short i = 0; i < 256; i++) {
 			b = (byte)i;
-			decoded = new String(Set1Functions.strXOR(cryptotext, new byte[]{b}));
+			decoded = Set1Functions.bytesXOR(cryptotext, new byte[]{b});
 			score = calcScore(decoded);
-			key = new String(new byte[] {b});
+			key = new byte[] {b};
 			curRes = new StrScore(decoded, score, key);
 			
 			pq.add(curRes);
@@ -185,14 +177,4 @@ public class Set1Ciphers {
 		
 		return results;
 	}
-
-	/*
-	public static void swap(Object[] array, int index0, int index1) {
-		Object temp = array[index0];
-		array[index0] = array[index1];
-		array[index1] = temp;
-	}
-	*/
-
-
 }

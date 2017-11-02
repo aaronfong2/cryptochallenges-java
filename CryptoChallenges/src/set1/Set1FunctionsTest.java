@@ -168,6 +168,18 @@ public class Set1FunctionsTest {
 			System.err.println(e.getMessage());
 		}
 	}
-	
+
+	@Test
+	public void testNormalizedHammingDistance3() {
+		String str1 = "this is a test";
+		String str2 = "wokka wokka!!!";
+		try {
+			assertEquals(2.642857, Set1Functions.normalizedHammingDistance(str1, str2), 1E-3);
+		}
+		catch (Exception e) {
+			System.err.println(e.getMessage());
+		}
+
+	}
 	
 }

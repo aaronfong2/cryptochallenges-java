@@ -6,7 +6,6 @@ import static set1.Set1Ciphers.*;
 public class Set1Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		String hex = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
 		String output = null;
 		
@@ -45,16 +44,21 @@ public class Set1Main {
 		System.out.println("Top Decodings: key, score, decoded text");
 		StrScore scores[] = charDecHex(c3encoded, 5);	
 		for (StrScore s: scores) {
-			System.out.println(s.key + "," + s.score + "," + s.str);
+			System.out.print(new String(s.key) + ",");
+			System.out.print(s.score + ",");
+			System.out.println(new String(s.str));
 		}
-		
+
 		System.out.println("\nCHALLENGE4");
 		String filename = "4.txt";
 		scores = charDecHexLines(filename, 5);
 		
 		System.out.println("Top Decodings: key, score, line#, decoded text");
 		for (StrScore s: scores) {
-			System.out.println(s.key + "," + s.score + "," + s.getLineNum() + "," + s.str);
+			System.out.print(new String(s.key) + ",");
+			System.out.print(s.score + ",");
+			System.out.print(s.getLineNum() + ",");
+			System.out.println(new String(s.str));
 		}
 		
 		System.out.println("\nCHALLENGE5");
@@ -69,9 +73,13 @@ public class Set1Main {
 		System.out.println("\nCHALLENGE6");
 		String filename2 = "6.txt";
 		System.out.println("Possible plaintexts:");
-		StrScore decoded[] = BreakRKXOR.decodeFile(filename2, 10);
+		StrScore decoded[] = BreakRKXOR.decodeFile(filename2, 4);
 		for (StrScore s: decoded) {
-			System.out.println(s.key + "," + s.str);
+			System.out.println("Score: " + s.score);
+			System.out.println("Key: " + new String(s.key));
+			System.out.println("Message: " + new String(s.str));
+			System.out.println("----------------------------------------------");
+			System.out.println("----------------------------------------------");
 		}
 
 		

@@ -47,13 +47,10 @@ public class Set1Functions {
 		return new String(decoder.decode(b64));	
 	}
 	
-	public static byte[] bytesXOR(byte[] array1, byte[] array2) throws Exception {
-		if (array1.length != array2.length)
-			throw new Exception("Arrays must be same length");
-		
-		byte output[] = new byte[array1.length];
+	public static byte[] bytesXOR(byte[] plaintext, byte[] key) {
+		byte output[] = new byte[plaintext.length];
 		for (int i = 0; i < output.length; i++)
-			output[i] = (byte)(array1[i] ^ array2[i]);
+			output[i] = (byte)(plaintext[i] ^ key[i % key.length]);
 
 		return output;
 	}
