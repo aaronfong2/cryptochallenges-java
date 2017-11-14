@@ -212,6 +212,72 @@ public class Set1Ciphers {
 		
 	}
 	
+	public static byte[] aes128ECBEncode(byte[] cryptotext, byte[] key) {
+		byte[] encoded = null;
+		Cipher cipher = null;
+		SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
+		try {
+			cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			encoded = cipher.doFinal(cryptotext);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		}
+		return encoded;
+	}
+		public static byte[] aes128ECBDecodeNoPadding(byte[] cryptotext, byte[] key) {
+		byte[] decoded = null;
+		Cipher cipher = null;
+		SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
+		try {
+			cipher = Cipher.getInstance("AES/ECB/NoPadding");
+			cipher.init(Cipher.DECRYPT_MODE, secretKey);
+			decoded = cipher.doFinal(cryptotext);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		}
+		return decoded;
+		
+	}
+	
+	public static byte[] aes128ECBEncodeNoPadding(byte[] cryptotext, byte[] key) {
+		byte[] encoded = null;
+		Cipher cipher = null;
+		SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
+		try {
+			cipher = Cipher.getInstance("AES/ECB/NoPadding");
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+			encoded = cipher.doFinal(cryptotext);
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			e.printStackTrace();
+		}
+		return encoded;
+	}
+
 	/*
 	 * Detects the first byte array that has been encrypted with AES ECB mode
 	 */
