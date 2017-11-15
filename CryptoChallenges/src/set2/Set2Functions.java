@@ -9,7 +9,8 @@ import set1.Set1Functions;
 
 public class Set2Functions {
 	// Blocksize in bytes
-	private static final int AES_BLOCKSIZE = 16;
+	public static final int AES_BLOCKSIZE = 16;
+	public static final int AES128_KEYSIZE = 16;
 	public static byte[] PKCS7Pad(byte[] plaintext, int blocksize) {
 		if (blocksize <= 0) {
 			throw new IllegalArgumentException("Blocksize must be >0");
@@ -33,10 +34,15 @@ public class Set2Functions {
 	}
 	
 	public static byte[] PKCS7Unpad(byte[] plaintext) throws BadPaddingException {
-		byte pad = plaintext[plaintext.length - 1];
+		// Use short to avoid overflow problems
+		short pad = (short)(plaintext[plaintext.length - 1] & 0xFF);
+		if (pad <= 0) {
+			throw new BadPaddingException();
+		}
+		// Validate padding
 		for (int i = 1; i < pad; i++) {
 			if (plaintext[plaintext.length - i - 1] != pad) {
-				throw new BadPaddingException("Bad padding.");
+				throw new BadPaddingException();
 			}
 		}
 		return Arrays.copyOf(plaintext, plaintext.length - pad);
@@ -44,7 +50,8 @@ public class Set2Functions {
 	
 	public static byte[] aes128CBCEncrypt(byte[] plaintext, byte[] key, byte[] IV) {
 		byte[] prevBlock = null;
-		byte[] block = null;
+		byte[] currBlock = null;
+		byte[] ptBlock = null;
 		byte[] paddedPT = PKCS7Pad(plaintext, AES_BLOCKSIZE);
 		byte[] encrypted = new byte[paddedPT.length];
 		
@@ -56,9 +63,10 @@ public class Set2Functions {
 		prevBlock = Arrays.copyOf(IV, AES_BLOCKSIZE);
 		for (int i = 0; i < paddedPT.length; i+=AES_BLOCKSIZE) {
 			// XOR with previous block, then AES encrypt 1 block
-			block = Set1Ciphers.aes128ECBEncodeNoPadding(Set1Functions.bytesXOR(Arrays.copyOfRange(plaintext, i, i+AES_BLOCKSIZE), prevBlock), key);
-			System.arraycopy(block, 0, encrypted, i, AES_BLOCKSIZE);
-			prevBlock = block;
+			ptBlock = Arrays.copyOfRange(paddedPT, i, i+AES_BLOCKSIZE);
+			currBlock = Set1Ciphers.aes128ECBEncodeNoPadding(Set1Functions.bytesXOR(ptBlock, prevBlock), key);
+			System.arraycopy(currBlock, 0, encrypted, i, AES_BLOCKSIZE);
+			prevBlock = currBlock;
 		}
 
 		return encrypted;
